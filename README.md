@@ -2,6 +2,10 @@
 Tak Manager
 # Description
 A simple task manager built with react, demonstrating global site management with `usecontext`.Users can add task, mark them complete,and serch/filter tasks.
+# Tools
+vite
+react-hook
+javascript
 
 # Setup
 follow this steps to access and run  task manager application
