@@ -3,8 +3,7 @@ import React from "react";
 export default function SearchBar({ setSearchTerm }) {
   return (
     <input
-      type="text"
-      placeholder="Search tasks..." // matches test
+      placeholder="Search tasks..."
       onChange={(e) => setSearchTerm(e.target.value)}
     />
   );

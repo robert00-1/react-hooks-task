@@ -18,7 +18,7 @@ copy and paste the link that will appear on your terminal and run it on your bro
 
 # Screenshot
 
-![alt text](<Screenshot from 2026-02-14 07-39-39.png>)
+![alt text](<Screenshot from 2026-02-14 09-05-57.png>)
 # Licenses
 this project is for learning purposes
 # Author 

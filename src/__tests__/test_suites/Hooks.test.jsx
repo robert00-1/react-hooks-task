@@ -1,46 +1,42 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, test } from "vitest";
 import App from "../../components/App";
 import { TaskProvider } from "../../context/TaskContext";
 
 describe("Task Manager App", () => {
+
   test("renders initial tasks from the backend", async () => {
-    global.setFetchResponse(global.baseTasks)
-    let { getByText } = render(
+    render(
       <TaskProvider>
         <App />
       </TaskProvider>
     );
-    
+
     await waitFor(() => {
-      expect(getByText("Buy groceries")).toBeInTheDocument();
-      expect(getByText("Finish React project")).toBeInTheDocument();
+      expect(screen.getByText("Buy groceries")).toBeInTheDocument();
+      expect(screen.getByText("Finish React project")).toBeInTheDocument();
     });
   });
 
   test("adds a new task when the form is submitted", async () => {
-    global.setFetchResponse(global.baseTasks)
-    let { getByText,getByPlaceholderText } = render(
+    render(
       <TaskProvider>
         <App />
       </TaskProvider>
     );
 
-    const input = getByPlaceholderText("Add a new task...");
-    const button = getByText("Add Task");
+    const input = screen.getByPlaceholderText("Add a new task...");
+    const button = screen.getByText("Add Task");
 
     fireEvent.change(input, { target: { value: "Walk the dog" } });
-    
-    global.setFetchResponse({ id: 3, title: "Walk the dog", completed: false })
+    fireEvent.click(button);
 
     await waitFor(() => {
-      fireEvent.click(button);
       expect(screen.getByText("Walk the dog")).toBeInTheDocument();
     });
   });
 
   test("filters tasks based on search input", async () => {
-    global.setFetchResponse(global.baseTasks)
     render(
       <TaskProvider>
         <App />
@@ -58,19 +54,22 @@ describe("Task Manager App", () => {
   });
 
   test("toggles task completion state", async () => {
-    global.setFetchResponse(global.baseTasks)
-    let { getByText, findAllByTestId } = render(
+    render(
       <TaskProvider>
         <App />
       </TaskProvider>
     );
-    const button =  await findAllByTestId("1")
-    global.setFetchResponse({ id: 1, title: "Buy groceries", completed: true })
-    
-    
+
+    // Get the checkbox for "Buy groceries"
+    const checkbox = screen.getByLabelText("Buy groceries");
+
+    // Click to toggle completion
+    fireEvent.click(checkbox);
+
+    // Wait for the label text to change to "Undo"
     await waitFor(() => {
-        fireEvent.click(button[0]);
-        expect(getByText("Undo")).toBeInTheDocument();
+      expect(screen.getByText("Undo")).toBeInTheDocument();
     });
   });
+
 });
