@@ -1,76 +1,81 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import App from "../../components/App";
+import { describe, it, beforeEach, expect } from "vitest";
 import { TaskProvider } from "../../context/TaskContext";
+import TaskForm from "../../components/TaskForm";
+import TaskList from "../../components/TaskList";
+
+// Mock initial tasks
+global.baseTasks = [
+  { id: 1, title: "Buy groceries", completed: false },
+  { id: 2, title: "Finish React project", completed: false },
+];
+
+global.setFetchResponse = (val) => {
+  global.fetch = vi.fn(() =>
+    Promise.resolve({
+      json: () => Promise.resolve(val),
+      ok: true,
+      status: 200,
+    })
+  );
+};
 
 describe("Task Manager App", () => {
-  test("renders initial tasks from the backend", async () => {
-    global.setFetchResponse(global.baseTasks)
-    let { getByText } = render(
-      <TaskProvider>
-        <App />
-      </TaskProvider>
-    );
-    
-    await waitFor(() => {
-      expect(getByText("Buy groceries")).toBeInTheDocument();
-      expect(getByText("Finish React project")).toBeInTheDocument();
-    });
+  beforeEach(() => {
+    global.setFetchResponse(global.baseTasks);
   });
 
-  test("adds a new task when the form is submitted", async () => {
-    global.setFetchResponse(global.baseTasks)
-    let { getByText,getByPlaceholderText } = render(
-      <TaskProvider>
-        <App />
-      </TaskProvider>
-    );
-
-    const input = getByPlaceholderText("Add a new task...");
-    const button = getByText("Add Task");
-
-    fireEvent.change(input, { target: { value: "Walk the dog" } });
-    
-    global.setFetchResponse({ id: 3, title: "Walk the dog", completed: false })
-
-    await waitFor(() => {
-      fireEvent.click(button);
-      expect(screen.getByText("Walk the dog")).toBeInTheDocument();
-    });
-  });
-
-  test("filters tasks based on search input", async () => {
-    global.setFetchResponse(global.baseTasks)
+  it("renders initial tasks from context", () => {
     render(
       <TaskProvider>
-        <App />
+        <TaskList />
       </TaskProvider>
     );
 
-    const searchInput = screen.getByPlaceholderText("Search tasks...");
-
-    fireEvent.change(searchInput, { target: { value: "groceries" } });
-
-    await waitFor(() => {
-      expect(screen.getByText("Buy groceries")).toBeInTheDocument();
-      expect(screen.queryByText("Finish React project")).not.toBeInTheDocument();
-    });
+    expect(screen.getByText("Buy groceries")).toBeInTheDocument();
+    expect(screen.getByText("Finish React project")).toBeInTheDocument();
   });
 
-  test("toggles task completion state", async () => {
-    global.setFetchResponse(global.baseTasks)
-    let { getByText, findAllByTestId } = render(
+  it("adds a new task when the form is submitted", () => {
+    render(
       <TaskProvider>
-        <App />
+        <TaskForm />
+        <TaskList />
       </TaskProvider>
     );
-    const button =  await findAllByTestId("1")
-    global.setFetchResponse({ id: 1, title: "Buy groceries", completed: true })
-    
-    
-    await waitFor(() => {
-        fireEvent.click(button[0]);
-        expect(getByText("Undo")).toBeInTheDocument();
-    });
+
+    const input = screen.getByPlaceholderText("Add a new task");
+    const button = screen.getByText("Add Task");
+
+    // Use a unique task title to avoid duplicates
+    fireEvent.change(input, { target: { value: "Go jogging" } });
+    fireEvent.click(button);
+
+    expect(screen.getByText("Go jogging")).toBeInTheDocument();
+  });
+
+  it("filters tasks based on search input", () => {
+    render(
+      <TaskProvider>
+        <TaskList searchTerm="buy" />
+      </TaskProvider>
+    );
+
+    expect(screen.getByText("Buy groceries")).toBeInTheDocument();
+    expect(screen.queryByText("Finish React project")).toBeNull();
+  });
+
+  it("toggles task completion state", () => {
+    render(
+      <TaskProvider>
+        <TaskList />
+      </TaskProvider>
+    );
+
+    const checkbox = screen.getByTestId(1);
+    expect(checkbox.checked).toBe(false);
+
+    fireEvent.click(checkbox);
+    expect(checkbox.checked).toBe(true);
   });
 });

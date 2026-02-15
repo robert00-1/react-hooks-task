@@ -21,8 +21,8 @@ npm run dev
 copy and paste the link that will appear on your terminal and run it on your browser to acess the manager task
 
 # Screenshot
+![alt text](<Screenshot from 2026-02-15 09-28-42.png>)
 
-![alt text](Screenshot-2026-02-14.png)
 
 # Licenses
 this project is for learning purposes
