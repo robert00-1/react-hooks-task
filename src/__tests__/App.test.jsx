@@ -1,10 +1,9 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, beforeEach } from 'vitest';
-import App from '../components/App.jsx';       
-import { setFetchResponse, baseTasks } from './setup.jsx'; 
+import App from '../components/App.jsx';
 
 describe("Task Manager App Full Integration", () => {
-  beforeEach(() => setFetchResponse(baseTasks));
+  beforeEach(() => global.setFetchResponse(global.baseTasks));
 
   it("renders initial tasks", () => {
     render(<App />);
@@ -17,12 +16,10 @@ describe("Task Manager App Full Integration", () => {
     const input = screen.getByPlaceholderText("Add a new task");
     const button = screen.getByText("Add Task");
 
-    // Use a unique task name for testing
     const newTask = "Walk the dog - test";
     fireEvent.change(input, { target: { value: newTask } });
     fireEvent.click(button);
 
-    // Now it will only match the newly added task
     expect(screen.getByText(newTask)).toBeInTheDocument();
   });
 
@@ -44,4 +41,3 @@ describe("Task Manager App Full Integration", () => {
     expect(checkbox.checked).toBe(true);
   });
 });
-
