@@ -1,7 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, beforeEach } from 'vitest';
 import App from '../components/App.jsx';       
-import { setFetchResponse, baseTasks } from '../setup.jsx'; 
+import { setFetchResponse, baseTasks } from './setup.jsx'; 
 
 describe("Task Manager App Full Integration", () => {
   beforeEach(() => setFetchResponse(baseTasks));
